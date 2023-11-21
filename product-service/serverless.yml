@@ -1,0 +1,87 @@
+service: my-first-app-mfialko-product-service
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: eu-west-1
+  profile: default
+  environment:
+    PRODUCTS_TABLE: products
+    STOCKS_TABLE: stocks
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: 
+        - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/products"
+        - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/stocks"
+
+resources:
+  Resources:
+  
+    ProductsDynamoDbTable:
+      Type: 'AWS::DynamoDB::Table'
+      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: products
+
+    StocksDynamoDbTable:
+      Type: 'AWS::DynamoDB::Table'
+      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: product_id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: product_id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: stocks
+        
+functions:
+  getProducts:
+    handler: dist/getProducts.handler
+    events:
+      - http:
+          path: products
+          method: get
+          cors: true
+
+  getProductById:
+    handler: dist/getProductById.handler
+    events:
+      - http:
+          path: products/{id}
+          method: get
+          cors: true
+
+  createProduct:
+    handler: dist/createProduct.handler
+    events:
+      - http:
+          path: products
+          method: post
+          cors: true
+  
+
+package:
+  individually: true
+  excludeDevDependencies: false
+  exclude: ['node_modules/**']
+
