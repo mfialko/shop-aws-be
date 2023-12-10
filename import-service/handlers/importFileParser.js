@@ -4,7 +4,6 @@ import { SQSClient, SendMessageCommand } from "@aws-sdk/client-sqs";
 
 
 const s3 = new AWS.S3();
-const sqs = new AWS.SQS();
 
 const sqsClient = new SQSClient();
 
@@ -65,22 +64,6 @@ export const handler = async (event) => {
 
   console.log('Lambda function completed');
 };
-
-// const sendRecords = (records) => {
-//   console.log('send records is started', records);
-//   console.log('SQS_URL is processed: ', process.env.SQS_URL);
-//   return Promise.allSettled(records.map(record => {
-//     return new Promise((resolve, _reject) => {
-//       sqs.sendMessage({
-//         QueueUrl: process.env.SQS_URL,
-//         MessageBody: record
-//       }, () => {
-//         console.log('Send message to SQS: ', record);
-//         resolve(record);
-//       })
-//     })
-//   }))
-// }
 
 const parseCsv = (s3Stream) => {
   return new Promise((resolve, reject) => {
