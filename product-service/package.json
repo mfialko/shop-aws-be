@@ -13,9 +13,10 @@
     "node": ">=14.15.0"
   },
   "dependencies": {
+    "@aws-sdk/client-sns": "^3.470.0",
     "aws-sdk": "^2.1500.0",
-    "uuid": "^9.0.1",
-    "serverless": "^3.37.0"
+    "serverless": "^3.37.0",
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.23.3",

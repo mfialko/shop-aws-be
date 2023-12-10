@@ -5,6 +5,7 @@ module.exports = {
     getProducts: './handlers/getProducts.js',
     getProductById: './handlers/getProductById.js',
     createProduct: './handlers/createProduct.js',
+    catalogBatchProcess: './handlers/catalogBatchProcess.js'
   },
   output: {
     filename: '[name].js',
