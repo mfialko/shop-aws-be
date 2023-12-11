@@ -2,10 +2,7 @@ const path = require('path');
 
 module.exports = {
   entry: {
-    getProducts: './handlers/getProducts.js',
-    getProductById: './handlers/getProductById.js',
-    createProduct: './handlers/createProduct.js',
-    catalogBatchProcess: './handlers/catalogBatchProcess.js'
+    basicAuthorizer: './handlers/basicAuthorizer.js'
   },
   output: {
     filename: '[name].js',

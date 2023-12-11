@@ -7,6 +7,8 @@ provider:
   profile: default
   environment:
     IMPORT_BUCKET: mfialko-first-app-import-bucket
+    SQS_URL: 
+      Ref: catalogItemsQueue
   iam:
     role: AccessS3Role #Custom role lambdas
 
@@ -17,6 +19,7 @@ functions:
       - http:
           path: import
           method: get
+          authorizer: arn:aws:lambda:eu-west-1:009688690949:function:authorization-service-dev-basicAuthorizer
           cors: true
           request:
             parameters:
@@ -35,6 +38,24 @@ functions:
 
 resources:
   Resources:
+    catalogItemsQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: import-service-queue
+
+    catalogItemsQueuePolicy:
+      Type: AWS::SQS::QueuePolicy
+      Properties:
+        Queues:
+          - Ref: catalogItemsQueue
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Principal: '*'
+              Action: 'sqs:*'
+              Resource: '*'
+        
     ImportBucket:
       Type: 'AWS::S3::Bucket'
       Properties:
@@ -93,6 +114,7 @@ resources:
                     - logs:CreateLogStream
                     - logs:PutLogEvents
                     - logs:TagResource
+                    - cloudformation:DescribeStacks
                   Resource:
                     - 'Fn::Join':
                       - ':'
@@ -100,17 +122,24 @@ resources:
                         - 'arn:aws:logs'
                         - Ref: 'AWS::Region'
                         - Ref: 'AWS::AccountId'
-                        - 'log-group:/aws/lambda/*:*:*'
-                -  Effect: "Allow"
-                   Action:
+                        - 'log-group:/aws/lambda/*:*:*' 
+                - Effect: "Allow"
+                  Action:
                     - s3:PutObject
                     - s3:PutObjectAcl
                     - s3:GetObject
                     - s3:DeleteObject
-                   Resource:
-                      "arn:aws:s3:::${self:provider.environment.IMPORT_BUCKET}/*"
+                  Resource:
+                    "arn:aws:s3:::${self:provider.environment.IMPORT_BUCKET}/*"
+                - Effect: Allow
+                  Action:
+                    - sqs:*
+                  Resource:
+                    - Fn::GetAtt:
+                      - catalogItemsQueue
+                      - Arn
     
-  
+
 package:
   individually: true
   excludeDevDependencies: false

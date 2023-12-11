@@ -1,0 +1,27 @@
+service: authorization-service
+
+plugins:
+  - serverless-dotenv-plugin
+
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: eu-west-1
+  profile: default
+
+      
+functions:
+  basicAuthorizer:
+    handler: dist/basicAuthorizer.handler
+    events:
+      - http:
+          method: get
+          path: hello
+
+      
+package:
+  individually: true
+  excludeDevDependencies: false
+  exclude: ['node_modules/**']
+
